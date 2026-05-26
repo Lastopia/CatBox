@@ -31,11 +31,12 @@ const { note } = Astro.props;
 const { Content } = note;
 const notebookSlug = Astro.params.slug?.split("/")[0] ?? "";
 const notebook = getNotebook(notebookSlug);
+const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout title={`${note.frontmatter.title} | 猫箱`}>
   <article class="note-article">
-    <a class="back-link" href={`/notebooks/${notebookSlug}/`}>返回{notebook?.name ?? "笔记本"}</a>
+    <a class="back-link" href={`${base}notebooks/${notebookSlug}/`}>返回{notebook?.name ?? "笔记本"}</a>
     <header>
       <p class="eyebrow">{note.frontmatter.notebook}</p>
       <h1>{note.frontmatter.title}</h1>

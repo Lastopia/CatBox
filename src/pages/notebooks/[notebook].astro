@@ -21,20 +21,23 @@ export function getStaticPaths() {
 }
 
 const notebook = getNotebook(Astro.params.notebook ?? "");
+const base = import.meta.env.BASE_URL;
 const notes = Object.entries(noteModules)
   .filter(([path]) => path.includes(`/notes/${notebook?.slug}/`))
-  .map(([path, note]) => ({
-    ...note.frontmatter,
-    displayDate: new Date(note.frontmatter.date).toISOString().slice(0, 10),
-    href: path
-      .replace("../../content/notes/", "/notebooks/")
-      .replace(/\.md$/, "/"),
-  }))
+  .map(([path, note]) => {
+    const slug = path.replace("../../content/notes/", "").replace(/\.md$/, "");
+
+    return {
+      ...note.frontmatter,
+      displayDate: new Date(note.frontmatter.date).toISOString().slice(0, 10),
+      href: `${base}notebooks/${slug}/`,
+    };
+  })
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 ---
 
 <BaseLayout title={`${notebook?.name ?? "笔记本"} | 猫箱`}>
-  <a class="back-link page-back" href="/notebooks/">返回笔记本</a>
+  <a class="back-link page-back" href={`${base}notebooks/`}>返回笔记本</a>
 
   <section class="page-heading">
     <p class="eyebrow">Notebook</p>

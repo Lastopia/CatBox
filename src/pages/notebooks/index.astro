@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { notebooks } from "../../data/notebooks";
 
+const base = import.meta.env.BASE_URL;
 const noteModules = import.meta.glob("../../content/notes/**/*.md", { eager: true });
 
 function countNotes(slug: string) {
@@ -10,7 +11,7 @@ function countNotes(slug: string) {
 ---
 
 <BaseLayout title="笔记本 | 猫箱">
-  <a class="back-link page-back" href="/">返回首页</a>
+  <a class="back-link page-back" href={base}>返回首页</a>
 
   <section class="page-heading">
     <p class="eyebrow">Notebooks</p>
@@ -26,7 +27,7 @@ function countNotes(slug: string) {
           <h2>{notebook.name}</h2>
           <p>{notebook.description}</p>
         </div>
-        <a href={`/notebooks/${notebook.slug}/`}>查看</a>
+        <a href={`${base}notebooks/${notebook.slug}/`}>查看</a>
       </article>
     ))}
   </section>
