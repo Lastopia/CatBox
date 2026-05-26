@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getNotebook } from "../../data/notebooks";
+
+type NoteModule = {
+  Content: unknown;
+  frontmatter: {
+    title: string;
+    date: string;
+    notebook: string;
+    description?: string;
+  };
+};
+
+export function getStaticPaths() {
+  const noteModules = import.meta.glob<NoteModule>("../../content/notes/**/*.md", {
+    eager: true,
+  });
+
+  return Object.entries(noteModules).map(([path, note]) => {
+    const slug = path.replace("../../content/notes/", "").replace(/\.md$/, "");
+
+    return {
+      params: { slug },
+      props: { note },
+    };
+  });
+}
+
+const { note } = Astro.props;
+const { Content } = note;
+const notebookSlug = Astro.params.slug?.split("/")[0] ?? "";
+const notebook = getNotebook(notebookSlug);
+---
+
+<BaseLayout title={`${note.frontmatter.title} | 猫箱`}>
+  <article class="note-article">
+    <a class="back-link" href={`/notebooks/${notebookSlug}/`}>返回{notebook?.name ?? "笔记本"}</a>
+    <header>
+      <p class="eyebrow">{note.frontmatter.notebook}</p>
+      <h1>{note.frontmatter.title}</h1>
+      <time datetime={note.frontmatter.date}>{note.frontmatter.date}</time>
+      {note.frontmatter.description && <p>{note.frontmatter.description}</p>}
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

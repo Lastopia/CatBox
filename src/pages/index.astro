@@ -1,17 +1,27 @@
 ---
-
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="猫箱">
+  <section class="hero">
+    <p class="eyebrow">Catbox Personal Site</p>
+    <h1>猫箱</h1>
+    <p class="intro">一个装着个人简介、笔记本、作品和灵感的小型个人网站。</p>
+    <div class="actions">
+      <a href="/notebooks/">进入笔记本</a>
+      <a href="/about/">关于我</a>
+    </div>
+  </section>
+
+  <section class="notice-board" aria-label="公告栏">
+    <div class="notice-pin"></div>
+    <p class="eyebrow">Notice</p>
+    <h2>公告栏</h2>
+    <p>猫箱正在搭建中。这里以后可以放网站更新、近期计划、想写给访客的话，或者提醒自己继续维护的小纸条。</p>
+    <ul>
+      <li>笔记本区域已经开放，内容会慢慢补上。</li>
+      <li>关于我页面还是草稿，后面会换成真实介绍。</li>
+      <li>背景视频和页面风格还会继续调整。</li>
+    </ul>
+  </section>
+</BaseLayout>

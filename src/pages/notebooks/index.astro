@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { notebooks } from "../../data/notebooks";
+
+const noteModules = import.meta.glob("../../content/notes/**/*.md", { eager: true });
+
+function countNotes(slug: string) {
+  return Object.keys(noteModules).filter((path) => path.includes(`/notes/${slug}/`)).length;
+}
+---
+
+<BaseLayout title="笔记本 | 猫箱">
+  <a class="back-link page-back" href="/">返回首页</a>
+
+  <section class="page-heading">
+    <p class="eyebrow">Notebooks</p>
+    <h1>笔记本</h1>
+    <p>这里不是给访客在线添加内容的地方，而是你作为网站创建者用 Markdown 慢慢写出来的博客区。</p>
+  </section>
+
+  <section class="notebook-grid" aria-label="笔记本列表">
+    {notebooks.map((notebook) => (
+      <article class="notebook-card">
+        <div>
+          <p class="notebook-count">{countNotes(notebook.slug)} 篇</p>
+          <h2>{notebook.name}</h2>
+          <p>{notebook.description}</p>
+        </div>
+        <a href={`/notebooks/${notebook.slug}/`}>查看</a>
+      </article>
+    ))}
+  </section>
+</BaseLayout>

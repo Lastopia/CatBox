@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getNotebook, notebooks } from "../../data/notebooks";
+
+type NoteModule = {
+  frontmatter: {
+    title: string;
+    date: string;
+    description?: string;
+  };
+};
+
+const noteModules = import.meta.glob<NoteModule>("../../content/notes/**/*.md", {
+  eager: true,
+});
+
+export function getStaticPaths() {
+  return notebooks.map((notebook) => ({
+    params: { notebook: notebook.slug },
+  }));
+}
+
+const notebook = getNotebook(Astro.params.notebook ?? "");
+const notes = Object.entries(noteModules)
+  .filter(([path]) => path.includes(`/notes/${notebook?.slug}/`))
+  .map(([path, note]) => ({
+    ...note.frontmatter,
+    displayDate: new Date(note.frontmatter.date).toISOString().slice(0, 10),
+    href: path
+      .replace("../../content/notes/", "/notebooks/")
+      .replace(/\.md$/, "/"),
+  }))
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+---
+
+<BaseLayout title={`${notebook?.name ?? "笔记本"} | 猫箱`}>
+  <a class="back-link page-back" href="/notebooks/">返回笔记本</a>
+
+  <section class="page-heading">
+    <p class="eyebrow">Notebook</p>
+    <h1>{notebook?.name}</h1>
+    <p>{notebook?.description}</p>
+  </section>
+
+  <section class="note-list" aria-label="文章列表">
+    {notes.length === 0 ? (
+      <p class="empty-state">这个笔记本还没有文章。以后新增 Markdown 文件后，这里会自动出现。</p>
+    ) : (
+      notes.map((note) => (
+        <article class="note-row">
+          <div>
+            <div class="note-row-header">
+              <h2><a href={note.href}>{note.title}</a></h2>
+              <time datetime={note.displayDate}>{note.displayDate}</time>
+            </div>
+            {note.description && <p>{note.description}</p>}
+          </div>
+        </article>
+      ))
+    )}
+  </section>
+</BaseLayout>
