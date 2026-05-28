@@ -4,9 +4,39 @@ import { notebooks } from "../../data/notebooks";
 
 const base = import.meta.env.BASE_URL;
 const noteModules = import.meta.glob("../../content/notes/**/*.md", { eager: true });
+const coverImages = import.meta.glob("../../content/notes/*/background.{png,jpg,jpeg,webp,avif,gif}", {
+  eager: true,
+  import: "default",
+  query: "?url",
+});
 
 function countNotes(slug: string) {
   return Object.keys(noteModules).filter((path) => path.includes(`/notes/${slug}/`)).length;
+}
+
+function getNotebookCover(slug: string) {
+  const cover = Object.entries(coverImages).find(([path]) =>
+    path.startsWith(`../../content/notes/${slug}/background.`),
+  );
+
+  return cover?.[1] as string | undefined;
+}
+
+const spineColors = [
+  "#2f7c72",
+  "#8f4f5f",
+  "#6d6aa8",
+  "#b06a3c",
+  "#557a45",
+  "#3f6f96",
+  "#a8577a",
+  "#7a6340",
+];
+
+function getSpineColor(slug: string) {
+  const hash = Array.from(slug).reduce((total, char) => total + char.codePointAt(0)!, 0);
+
+  return spineColors[hash % spineColors.length];
 }
 ---
 
@@ -20,15 +50,29 @@ function countNotes(slug: string) {
   </section>
 
   <section class="notebook-grid" aria-label="笔记本列表">
-    {notebooks.map((notebook) => (
-      <article class="notebook-card">
-        <div>
-          <p class="notebook-count">{countNotes(notebook.slug)} 篇</p>
-          <h2>{notebook.name}</h2>
-          <p>{notebook.description}</p>
-        </div>
-        <a href={`${base}notebooks/${notebook.slug}/`}>查看</a>
-      </article>
-    ))}
+    {notebooks.map((notebook) => {
+      const cover = getNotebookCover(notebook.slug);
+      const style = [
+        `--book-spine-color: ${getSpineColor(notebook.slug)};`,
+        cover ? `--cover-image: url("${cover}");` : "",
+      ].join(" ");
+
+      return (
+        <a
+          class:list={["notebook-card", { "has-cover": cover }]}
+          href={`${base}notebooks/${notebook.slug}/`}
+          style={style}
+        >
+          <div class="book-face">
+            <span class="book-spine"></span>
+            <div class="book-cover">
+              <p class="notebook-count">{countNotes(notebook.slug)} 篇</p>
+              <h2>{notebook.name}</h2>
+            </div>
+          </div>
+          <div class="book-pages" aria-hidden="true"></div>
+        </a>
+      );
+    })}
   </section>
 </BaseLayout>

@@ -99,8 +99,7 @@ h2 {
   gap: 12px;
 }
 
-.actions a,
-.notebook-card a {
+.actions a {
   border: 1px solid var(--accent);
   border-radius: 8px;
   padding: 10px 16px;
@@ -117,12 +116,12 @@ h2 {
 
 .notebook-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 190px));
+  gap: 28px;
+  align-items: start;
 }
 
-.content-panel,
-.notebook-card {
+.content-panel {
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.5);
@@ -132,7 +131,6 @@ h2 {
 }
 
 .content-panel,
-.notebook-card p,
 .page-heading p {
   color: var(--muted);
   line-height: 1.8;
@@ -158,17 +156,145 @@ h2 {
 }
 
 .notebook-card {
-  min-height: 240px;
+  position: relative;
+  width: 190px;
+  height: 270px;
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  perspective: 900px;
+}
+
+.notebook-card::after {
+  position: absolute;
+  left: 18px;
+  right: 6px;
+  bottom: -10px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(37, 33, 28, 0.2);
+  filter: blur(8px);
+  content: "";
+}
+
+.book-face {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+  transform-origin: left center;
+}
+
+.book-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  border-radius: 7px 10px 10px 7px;
+  background:
+    linear-gradient(90deg, rgba(37, 33, 28, 0.24), rgba(37, 33, 28, 0) 18%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(222, 214, 202, 0.7));
+  box-shadow:
+    12px 18px 32px rgba(37, 33, 28, 0.18),
+    inset 12px 0 18px rgba(37, 33, 28, 0.16),
+    inset -1px 0 0 rgba(255, 255, 255, 0.7);
+  padding: 24px 22px 24px 30px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 20px;
+}
+
+.notebook-card.has-cover .book-cover {
+  background:
+    linear-gradient(90deg, rgba(37, 33, 28, 0.46), rgba(37, 33, 28, 0.05) 22%),
+    linear-gradient(180deg, rgba(37, 33, 28, 0.08), rgba(37, 33, 28, 0.34)),
+    var(--cover-image) center / cover;
+}
+
+.book-cover::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.2), transparent 44%),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+  pointer-events: none;
+  content: "";
+}
+
+.book-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  width: 22px;
+  border-radius: 7px 0 0 7px;
+  background:
+    linear-gradient(90deg, rgba(37, 33, 28, 0.35), rgba(255, 255, 255, 0.14)),
+    var(--book-spine-color, var(--accent));
+  box-shadow: inset -1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.book-pages {
+  position: absolute;
+  top: 12px;
+  right: -8px;
+  bottom: 10px;
+  z-index: 1;
+  width: 18px;
+  border-radius: 0 7px 7px 0;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      #fffaf0 0,
+      #fffaf0 5px,
+      #e5dccf 6px
+    );
+  box-shadow: 7px 12px 22px rgba(37, 33, 28, 0.14);
+}
+
+.notebook-card h2,
+.notebook-card .notebook-count {
+  position: relative;
+  z-index: 1;
+}
+
+.notebook-card h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.45rem;
+  line-height: 1.25;
+  text-shadow: 0 2px 12px rgba(37, 33, 28, 0.46);
+  overflow-wrap: anywhere;
+}
+
+.notebook-card:not(.has-cover) h2 {
+  color: var(--text);
+  text-shadow: none;
 }
 
 .notebook-count {
-  color: var(--rose);
+  color: #ffffff;
   font-size: 0.9rem;
   font-weight: 800;
+  text-shadow: 0 2px 10px rgba(37, 33, 28, 0.42);
+}
+
+.notebook-card:not(.has-cover) .notebook-count {
+  color: var(--rose);
+  text-shadow: none;
+}
+
+.notebook-card:hover .book-face {
+  transform: translateY(-4px) rotateY(-4deg);
+}
+
+.notebook-card:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 8px;
 }
 
 .notice-board {
@@ -190,19 +316,34 @@ h2 {
   line-height: 1.05;
 }
 
+.notice-board :is(h2, h3, h4):not(:first-of-type) {
+  margin: 14px 0 6px;
+  color: var(--accent-dark);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
 .notice-board p,
 .notice-board li {
   color: var(--muted);
-  line-height: 1.8;
+  line-height: 1.5;
+}
+
+.notice-board p {
+  margin-bottom: 8px;
 }
 
 .notice-board ul {
-  margin: 16px 0 0;
+  margin: 8px 0 0;
   padding-left: 1.2em;
 }
 
 .notice-board li + li {
-  margin-top: 6px;
+  margin-top: 3px;
+}
+
+.notice-board ul ul {
+  margin-top: 3px;
 }
 
 .notice-pin {
@@ -228,6 +369,19 @@ h2 {
   box-shadow: 0 18px 42px rgba(37, 33, 28, 0.12);
   backdrop-filter: blur(14px);
   padding: 20px 22px;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.note-row:hover,
+.note-row:focus-within {
+  border-color: rgba(47, 124, 114, 0.28);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 24px 52px rgba(37, 33, 28, 0.16);
+  transform: translateY(-4px);
 }
 
 .note-row > div {
@@ -246,8 +400,11 @@ h2 {
 .note-row time,
 .note-article time {
   color: var(--rose);
-  font-size: 0.92rem;
   font-weight: 800;
+}
+
+.note-row time {
+  font-size: 0.92rem;
 }
 
 .note-row h2 {
@@ -280,16 +437,65 @@ h2 {
 }
 
 .note-article {
-  max-width: 760px;
+  width: min(860px, 100%);
+  margin: 0 auto;
 }
 
 .note-article header {
-  margin: 22px 0 34px;
+  margin: 22px 0 30px;
+}
+
+.note-article header .eyebrow {
+  margin-bottom: 12px;
+}
+
+.note-article time {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
 }
 
 .note-article h1 {
-  margin: 10px 0 18px;
+  margin: 0 0 22px;
   font-size: clamp(2.5rem, 8vw, 5.5rem);
+}
+
+.note-article header p:not(.eyebrow) {
+  max-width: 720px;
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.core-ideas-card {
+  margin: 0 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow: 0 18px 42px rgba(37, 33, 28, 0.12);
+  backdrop-filter: blur(14px);
+  padding: 24px 26px;
+}
+
+.core-ideas-card h2 {
+  margin: 6px 0 14px;
+  font-size: 1.45rem;
+}
+
+.core-ideas-card ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.core-ideas-card li {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.core-ideas-card li + li {
+  margin-top: 8px;
 }
 
 .back-link {
@@ -317,6 +523,100 @@ h2 {
   color: var(--text);
   font-size: 1.08rem;
   line-height: 1.9;
+}
+
+.prose a {
+  color: var(--accent-dark);
+  font-weight: 700;
+  text-decoration-color: rgba(47, 124, 114, 0.42);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+}
+
+.prose a:hover {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
+.note-body-card {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.56);
+  box-shadow: 0 22px 54px rgba(37, 33, 28, 0.14);
+  backdrop-filter: blur(14px);
+  padding: 34px;
+}
+
+.note-body-card > :first-child {
+  margin-top: 0;
+}
+
+.note-body-card > :last-child {
+  margin-bottom: 0;
+}
+
+.prose code {
+  border: 1px solid rgba(222, 214, 202, 0.78);
+  border-radius: 6px;
+  background: rgba(247, 244, 238, 0.82);
+  color: #3f3932;
+  padding: 0.12em 0.36em;
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.prose pre {
+  overflow-x: auto;
+  border: 1px solid rgba(222, 214, 202, 0.9);
+  border-radius: 8px;
+  background: rgba(238, 233, 225, 0.96) !important;
+  color: #2f2a25 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  padding: 16px 18px;
+}
+
+.prose pre code {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  color: #2f2a25 !important;
+  font-size: 0.94rem;
+  line-height: 1.75;
+}
+
+.prose pre code span {
+  color: #2f2a25 !important;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border: 1px solid rgba(222, 214, 202, 0.9);
+  border-radius: 8px;
+  background: rgba(238, 233, 225, 0.68);
+  font-size: 0.96rem;
+}
+
+.prose :where(th, td) {
+  border-bottom: 1px solid rgba(222, 214, 202, 0.82);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  background: rgba(232, 224, 214, 0.92);
+  color: var(--text);
+}
+
+.prose td {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.prose tr:last-child td {
+  border-bottom: 0;
 }
 
 .about-hero,
@@ -451,7 +751,22 @@ h2 {
 
 @media (max-width: 760px) {
   .notebook-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    justify-items: center;
+    gap: 22px;
+  }
+
+  .notebook-card {
+    width: 160px;
+    height: 228px;
+  }
+
+  .book-cover {
+    padding: 20px 18px 20px 26px;
+  }
+
+  .notebook-card h2 {
+    font-size: 1.24rem;
   }
 
   .hero {
