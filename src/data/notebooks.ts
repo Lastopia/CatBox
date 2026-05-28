@@ -5,6 +5,11 @@ export const notebooks = [
     description: "记录编程、工具、语言和其他学习过程中的整理。",
   },
   {
+    name: "研究笔记",
+    slug: "research",
+    description: "整理 AI、技术论文、模型架构和长期研究问题。",
+  },
+  {
     name: "生活随想",
     slug: "life",
     description: "放一些日常想法、观察、灵感和碎片记录。",

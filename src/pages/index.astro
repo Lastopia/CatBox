@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { Content as NoticeContent, frontmatter as notice } from "../content/notice.md";
 
 const base = import.meta.env.BASE_URL;
 ---
@@ -17,13 +18,8 @@ const base = import.meta.env.BASE_URL;
 
   <section class="notice-board" aria-label="公告栏">
     <div class="notice-pin"></div>
-    <p class="eyebrow">Notice</p>
-    <h2>公告栏</h2>
-    <p>猫箱正在搭建中。这里以后可以放网站更新、近期计划、想写给访客的话，或者提醒自己继续维护的小纸条。</p>
-    <ul>
-      <li>笔记本区域已经开放，内容会慢慢补上。</li>
-      <li>关于我页面还是草稿，后面会换成真实介绍。</li>
-      <li>背景视频和页面风格还会继续调整。</li>
-    </ul>
+    <p class="eyebrow">{notice.eyebrow}</p>
+    <h2>{notice.title}</h2>
+    <NoticeContent />
   </section>
 </BaseLayout>
