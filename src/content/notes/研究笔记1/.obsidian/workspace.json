@@ -1,0 +1,255 @@
+{
+  "main": {
+    "id": "a6dbf06b0f4f9bc8",
+    "type": "split",
+    "children": [
+      {
+        "id": "5d718f5341deb31e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "04973cc9eb41377e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "世界模型总览.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
+              },
+              "icon": "lucide-file",
+              "title": "世界模型总览"
+            }
+          },
+          {
+            "id": "f797a7a9aca064d3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "_链接卡片.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
+              },
+              "icon": "lucide-file",
+              "title": "_链接卡片"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4195a7e7ed463434",
+    "type": "split",
+    "children": [
+      {
+        "id": "4b975f08ba0b8340",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0ad012b9327d32fd",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "aa437990f2bdd41c",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "0421630ba8e9ec55",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "right": {
+    "id": "0a4ae25fefae3179",
+    "type": "split",
+    "children": [
+      {
+        "id": "d9030cb342b666cb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "deaf96b27fd258b4",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Experiment Report.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Experiment Report 的反向链接列表"
+            }
+          },
+          {
+            "id": "2480974118eae2a1",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Experiment Report.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Experiment Report 的出链列表"
+            }
+          },
+          {
+            "id": "97bea5489f654c5c",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "9387f2635a1257d0",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "fcd6801f584c683e",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Experiment Report.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Experiment Report 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false,
+      "media-extended:Open media": false,
+      "templater-obsidian:Templater": false
+    }
+  },
+  "active": "f797a7a9aca064d3",
+  "lastOpenFiles": [
+    "附件/Pasted image 20260603120318.png",
+    "世界模型总览.md",
+    "研究计划总览.md",
+    "background.png",
+    "_链接卡片.md",
+    "附件/Pasted image 20260603083343.png",
+    "Pasted image 20260603083204.png",
+    "附件",
+    "Pasted image 20260603080708.png",
+    "个人笔记/知识注入与知识增强语言模型.md",
+    "个人网站/src/content/notes/研究笔记1/_链接卡片.md",
+    "个人网站/src/content/notes/研究笔记1/世界模型总览.md",
+    "个人网站/dist/_astro/background.CZl2eKKp.png",
+    "个人网站/dist/_astro/background.CgK3Fq0Z.png",
+    "个人网站/dist/_astro",
+    "个人网站/dist/videos/BG1.mp4",
+    "个人网站/dist/videos",
+    "个人网站/dist/styles/global.css",
+    "个人网站/dist/styles",
+    "个人网站/dist/favicon.svg",
+    "个人网站/dist/favicon.ico",
+    "个人网站/dist/covers/wood-desk-cover-1.png",
+    "个人网站/dist/covers/wood-desk-cover-3.png",
+    "个人网站/dist/covers/wood-desk-cover-2.png",
+    "个人网站/dist/covers",
+    "个人网站/dist/notebooks/研究笔记1/研究计划总览/index.html",
+    "个人网站/dist/notebooks/研究笔记1/世界模型总览/index.html",
+    "个人网站/src/content/notice.md",
+    "个人网站/src/content/notes/个人skill/MD笔记规则.md",
+    "个人网站/src/content/notes/研究笔记1/研究计划总览.md",
+    "个人网站/src/content/notes/研究笔记1/研究计划总览 - 副本.md",
+    "个人笔记/世界模型研究.md",
+    "个人笔记/稀疏表示与稀疏激活.md",
+    "个人笔记/总览.md",
+    "个人笔记/多模态研究笔记.md",
+    "个人网站/src/content/notes/个人skill/__concept-test.md",
+    "个人网站/src/content/notes/个人skill/项目代码规则.md",
+    "个人笔记/解耦表示学习.md",
+    "个人笔记/概念瓶颈模型.md",
+    "个人笔记/多头注意力可解释性.md",
+    "个人笔记/多模态研究.md",
+    "个人笔记/层级干预研究.md",
+    "地城冒险者公会/docs/战斗机制与战斗属性设计.md",
+    "个人笔记/层级化模块化神经网络.md",
+    "个人笔记/细粒度专家混合模型.md",
+    "个人笔记/神经符号结合与默认继承.md"
+  ]
+}

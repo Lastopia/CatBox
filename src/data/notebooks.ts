@@ -1,12 +1,11 @@
-const noteModules = import.meta.glob("../content/notes/**/*.md", { eager: true });
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 
-export const notebooks = Array.from(
-  new Set(
-    Object.keys(noteModules)
-      .map((path) => path.replace("../content/notes/", "").split("/")[0])
-      .filter(Boolean),
-  ),
-)
+const notesDir = join(process.cwd(), "src", "content", "notes");
+
+export const notebooks = readdirSync(notesDir, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
   .sort((a, b) => a.localeCompare(b, "zh-CN"))
   .map((name) => ({
     name,

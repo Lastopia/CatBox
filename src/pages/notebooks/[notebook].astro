@@ -24,6 +24,7 @@ const notebook = getNotebook(Astro.params.notebook ?? "");
 const base = import.meta.env.BASE_URL;
 const notes = Object.entries(noteModules)
   .filter(([path]) => path.includes(`/notes/${notebook?.slug}/`))
+  .filter(([path]) => !path.split("/").at(-1)?.startsWith("_"))
   .map(([path, note]) => {
     const slug = path.replace("../../content/notes/", "").replace(/\.md$/, "");
 

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getNotebook } from "../../data/notebooks";
+import { parseConceptCards, parseLinkCards } from "../../utils/conceptCards";
 
 type NoteModule = {
   Content: unknown;
@@ -13,32 +14,74 @@ type NoteModule = {
   };
 };
 
+function isPaperCard(type?: string) {
+  return (type ?? "").includes("论文");
+}
+
 export function getStaticPaths() {
   const noteModules = import.meta.glob<NoteModule>("../../content/notes/**/*.md", {
     eager: true,
   });
-
-  return Object.entries(noteModules).map(([path, note]) => {
-    const slug = path.replace("../../content/notes/", "").replace(/\.md$/, "");
-
-    return {
-      params: { slug },
-      props: { note },
-    };
+  const rawNoteModules = import.meta.glob<string>("../../content/notes/**/*.md", {
+    query: "?raw",
+    import: "default",
+    eager: true,
   });
+  const noteImages = import.meta.glob<string>("../../content/notes/**/*.{png,jpg,jpeg,webp,avif,gif,svg}", {
+    query: "?url",
+    import: "default",
+    eager: true,
+  });
+
+  return Object.entries(noteModules)
+    .filter(([path]) => !path.split("/").at(-1)?.startsWith("_"))
+    .map(([path, note]) => {
+      const slug = path.replace("../../content/notes/", "").replace(/\.md$/, "");
+      const notebookSlug = slug.split("/")[0] ?? "";
+      const linkCardsPath = `../../content/notes/${notebookSlug}/_链接卡片.md`;
+
+      return {
+        params: { slug },
+        props: {
+          note,
+          rawContent: rawNoteModules[path] ?? "",
+          rawLinkCards: rawNoteModules[linkCardsPath] ?? "",
+          imageUrls: Object.fromEntries(
+            Object.entries(noteImages)
+              .filter(([imagePath]) => imagePath.includes(`/notes/${notebookSlug}/`))
+              .map(([imagePath, imageUrl]) => [
+                imagePath.replace(`../../content/notes/${notebookSlug}/`, ""),
+                imageUrl,
+              ]),
+          ),
+        },
+      };
+    });
 }
 
-const { note } = Astro.props;
+const { note, rawContent, rawLinkCards, imageUrls } = Astro.props;
 const { Content } = note;
 const notebookSlug = Astro.params.slug?.split("/")[0] ?? "";
 const notebook = getNotebook(notebookSlug);
 const base = import.meta.env.BASE_URL;
 const displayDate = new Date(note.frontmatter.date).toISOString().slice(0, 10);
 const coreIdeas = note.frontmatter.coreIdeas ?? [];
+const conceptCards = parseConceptCards(rawContent);
+const resolveCardImage = (src: string) => {
+  const cleanSrc = decodeURIComponent(src).replace(/\\/g, "/").replace(/^\.?\//, "");
+  const fileName = cleanSrc.split("/").at(-1) ?? cleanSrc;
+  const matchedImage = Object.entries(imageUrls).find(([imagePath]) => {
+    return imagePath === cleanSrc || imagePath.endsWith(`/${cleanSrc}`) || imagePath.split("/").at(-1) === fileName;
+  });
+
+  return imageUrls[cleanSrc] ?? matchedImage?.[1] ?? src;
+};
+const linkCards = parseLinkCards(rawLinkCards, { resolveImage: resolveCardImage });
+const hasPaperCards = linkCards.some((card) => isPaperCard(card.type));
 ---
 
 <BaseLayout title={`${note.frontmatter.title} | 猫箱`}>
-  <article class="note-article">
+  <article class:list={["note-article", hasPaperCards && "has-link-cards"]}>
     <a class="back-link" href={`${base}notebooks/${notebookSlug}/`}>返回{notebook?.name ?? "笔记本"}</a>
     <header>
       <p class="eyebrow">{note.frontmatter.notebook}</p>
@@ -55,8 +98,195 @@ const coreIdeas = note.frontmatter.coreIdeas ?? [];
         </ul>
       </section>
     )}
-    <div class="note-body-card prose">
-      <Content />
+    <div class:list={["note-reading-layout", conceptCards.length > 0 && "has-concept-cards"]}>
+      <div class="note-body-card prose">
+        <Content />
+      </div>
+      {conceptCards.length > 0 && (
+        <aside class="concept-card-panel" aria-label="概念卡片">
+          <div class="concept-card-empty" data-concept-empty>
+            <p class="eyebrow">Concept</p>
+            <h2>概念卡片</h2>
+            <p>点击正文里的概念标签后，这里会显示对应说明。</p>
+          </div>
+          {conceptCards.map((card) => (
+            <section class="concept-card" data-concept-card={card.id} hidden>
+              <p class="eyebrow">{card.type ?? "Concept"}</p>
+              <h2>{card.title}</h2>
+              {card.link && (
+                <a class="concept-card-link" href={card.link} target="_blank" rel="noreferrer">
+                  打开相关链接
+                </a>
+              )}
+              {card.html && <div class="concept-card-body" set:html={card.html} />}
+            </section>
+          ))}
+        </aside>
+      )}
     </div>
+    {hasPaperCards && (
+      <aside class="link-popover" data-paper-card-panel hidden aria-label="论文卡片">
+        <p class="eyebrow" data-paper-card-type>Link</p>
+        <h2 data-paper-card-title></h2>
+        <div class="link-popover-meta" data-paper-card-meta hidden></div>
+        <a class="link-popover-url" data-paper-card-url target="_blank" rel="noreferrer">打开相关链接</a>
+        <div class="link-popover-body" data-paper-card-body></div>
+      </aside>
+    )}
+    {linkCards.length > 0 && (
+      <aside class="keyword-popover" data-keyword-card-panel hidden aria-label="关键词卡片">
+        <p class="eyebrow" data-keyword-card-type>Keyword</p>
+        <h2 data-keyword-card-title></h2>
+        <a class="keyword-popover-url" data-keyword-card-url target="_blank" rel="noreferrer" hidden>打开相关链接</a>
+        <div class="keyword-popover-body" data-keyword-card-body></div>
+      </aside>
+    )}
   </article>
+  {linkCards.length > 0 && (
+    <script type="application/json" id="link-card-data" set:html={JSON.stringify(linkCards)} />
+  )}
+  {conceptCards.length > 0 && (
+    <script>
+      const triggers = Array.from(document.querySelectorAll(".concept-trigger"));
+      const cards = Array.from(document.querySelectorAll("[data-concept-card]"));
+      const empty = document.querySelector("[data-concept-empty]");
+
+      function showConcept(concept) {
+        let found = false;
+
+        cards.forEach((card) => {
+          const isTarget = card.getAttribute("data-concept-card") === concept;
+          card.hidden = !isTarget;
+          found = found || isTarget;
+        });
+
+        if (empty) {
+          empty.hidden = found;
+        }
+
+        triggers.forEach((trigger) => {
+          trigger.classList.toggle("is-active", trigger.getAttribute("data-concept") === concept && found);
+        });
+      }
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+          const concept = trigger.getAttribute("data-concept");
+          if (concept) showConcept(concept);
+        });
+      });
+    </script>
+  )}
+  {linkCards.length > 0 && (
+    <script>
+      const linkCards = JSON.parse(document.getElementById("link-card-data")?.textContent || "[]");
+      const paperPanel = document.querySelector("[data-paper-card-panel]");
+      const paperType = document.querySelector("[data-paper-card-type]");
+      const paperTitle = document.querySelector("[data-paper-card-title]");
+      const paperMeta = document.querySelector("[data-paper-card-meta]");
+      const paperUrl = document.querySelector("[data-paper-card-url]");
+      const paperBody = document.querySelector("[data-paper-card-body]");
+      const keywordPanel = document.querySelector("[data-keyword-card-panel]");
+      const keywordType = document.querySelector("[data-keyword-card-type]");
+      const keywordTitle = document.querySelector("[data-keyword-card-title]");
+      const keywordUrl = document.querySelector("[data-keyword-card-url]");
+      const keywordBody = document.querySelector("[data-keyword-card-body]");
+
+      function normalize(value) {
+        return (value || "").trim().toLowerCase();
+      }
+
+      function isKeywordCard(card) {
+        return (card.type || "").includes("关键词");
+      }
+
+      function findLinkCard(anchor) {
+        const href = anchor.getAttribute("href") || "";
+        const text = anchor.textContent || "";
+
+        return linkCards.find((card) => {
+          return normalize(card.id) === normalize(text) || normalize(card.link) === normalize(href);
+        });
+      }
+
+      function setActiveLink(anchor) {
+        document.querySelectorAll(".link-card-trigger").forEach((link) => {
+          link.classList.toggle("is-active", link === anchor);
+        });
+      }
+
+      function fillKeywordCard(card, anchor) {
+        if (!keywordPanel) return;
+
+        keywordType.textContent = card.type || "Keyword";
+        keywordTitle.textContent = card.title || card.id;
+        keywordBody.innerHTML = card.html || "";
+        if (card.link) {
+          keywordUrl.href = card.link;
+          keywordUrl.hidden = false;
+        } else {
+          keywordUrl.hidden = true;
+        }
+
+        const rect = anchor.getBoundingClientRect();
+        const width = Math.min(360, window.innerWidth - 32);
+        let left = rect.right - width;
+        let top = rect.bottom + 10;
+
+        keywordPanel.style.width = `${width}px`;
+        keywordPanel.style.left = `${Math.max(16, left)}px`;
+        keywordPanel.style.top = `${Math.max(16, top)}px`;
+        keywordPanel.hidden = false;
+      }
+
+      function fillPaperCard(card) {
+        if (!paperPanel) return;
+
+        paperType.textContent = card.type || "Link";
+        paperTitle.textContent = card.title || card.id;
+        paperUrl.href = card.link || "#";
+        const metaItems = [];
+        if (card.date) metaItems.push(`<span>发表时间：${card.date}</span>`);
+        if (card.authors) metaItems.push(`<span>作者：${card.authors}</span>`);
+        paperMeta.innerHTML = metaItems.join("");
+        paperMeta.hidden = metaItems.length === 0;
+        paperBody.innerHTML = card.html || "";
+        paperPanel.hidden = false;
+        bindLinkTriggers(paperBody);
+      }
+
+      function bindLinkTriggers(scope = document) {
+        const links = Array.from(scope.querySelectorAll("a[href]"));
+
+        links.forEach((anchor) => {
+          const card = findLinkCard(anchor);
+          if (!card || anchor.dataset.linkCardBound === "true") return;
+
+          anchor.dataset.linkCardBound = "true";
+          anchor.classList.add("link-card-trigger");
+          anchor.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            if (isKeywordCard(card)) {
+              fillKeywordCard(card, anchor);
+            } else {
+              fillPaperCard(card);
+              if (keywordPanel) keywordPanel.hidden = true;
+            }
+
+            setActiveLink(anchor);
+          });
+        });
+      }
+
+      bindLinkTriggers(document.querySelector(".note-body-card"));
+
+      document.addEventListener("click", (event) => {
+        if (!keywordPanel || keywordPanel.hidden) return;
+        const target = event.target;
+        if (keywordPanel.contains(target) || target.closest(".link-card-trigger")) return;
+        keywordPanel.hidden = true;
+      });
+    </script>
+  )}
 </BaseLayout>
