@@ -10,7 +10,7 @@ type NoteModule = {
   };
 };
 
-const noteModules = import.meta.glob<NoteModule>("../../content/notes/**/*.md", {
+const noteModules = import.meta.glob<NoteModule>(["../../content/notes/**/*.md", "!../../content/notes/**/_*.md"], {
   eager: true,
 });
 

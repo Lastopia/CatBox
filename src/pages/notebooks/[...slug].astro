@@ -19,7 +19,7 @@ function isPaperCard(type?: string) {
 }
 
 export function getStaticPaths() {
-  const noteModules = import.meta.glob<NoteModule>("../../content/notes/**/*.md", {
+  const noteModules = import.meta.glob<NoteModule>(["../../content/notes/**/*.md", "!../../content/notes/**/_*.md"], {
     eager: true,
   });
   const rawNoteModules = import.meta.glob<string>("../../content/notes/**/*.md", {
@@ -221,10 +221,12 @@ const hasPaperCards = linkCards.some((card) => isPaperCard(card.type));
         keywordType.textContent = card.type || "Keyword";
         keywordTitle.textContent = card.title || card.id;
         keywordBody.innerHTML = card.html || "";
-        if (card.link) {
-          keywordUrl.href = card.link;
+        const keywordLink = (card.link || "").trim();
+        if (keywordLink) {
+          keywordUrl.href = keywordLink;
           keywordUrl.hidden = false;
         } else {
+          keywordUrl.removeAttribute("href");
           keywordUrl.hidden = true;
         }
 

@@ -1,3 +1,5 @@
+import katex from "katex";
+
 export type ConceptCard = {
   id: string;
   title: string;
@@ -36,13 +38,42 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
-function renderInline(markdown: string) {
+function renderMath(formula: string, displayMode = false) {
+  return katex.renderToString(formula.trim(), {
+    displayMode,
+    throwOnError: false,
+    strict: false,
+  });
+}
+
+function renderTextInline(markdown: string) {
   return escapeHtml(markdown)
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\[([^\]]+)\]\(([^)\s]*)\)/g, (_match, label, href) => {
       return `<a href="${href || "#"}">${label}</a>`;
     });
+}
+
+function renderInline(markdown: string) {
+  const mathPattern = /(^|[^\\])\$([^$\n]+?)\$/g;
+  let rendered = "";
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = mathPattern.exec(markdown)) !== null) {
+    const prefix = match[1];
+    const formulaStart = match.index + prefix.length;
+    rendered += renderTextInline(markdown.slice(lastIndex, formulaStart));
+    rendered += renderMath(match[2]);
+    lastIndex = mathPattern.lastIndex;
+  }
+
+  return rendered + renderTextInline(markdown.slice(lastIndex));
+}
+
+function renderDisplayMath(formula: string) {
+  return renderMath(formula, true);
 }
 
 function renderImage(src: string, alt: string, options: RenderOptions) {
@@ -56,6 +87,7 @@ function renderSimpleMarkdown(markdown: string, options: RenderOptions = {}) {
   let paragraph: string[] = [];
   let list: string[] = [];
   let quote: string[] = [];
+  let displayMath: string[] | null = null;
 
   const flushParagraph = () => {
     if (paragraph.length === 0) return;
@@ -84,8 +116,31 @@ function renderSimpleMarkdown(markdown: string, options: RenderOptions = {}) {
   for (const line of lines) {
     const trimmed = line.trim();
 
+    if (displayMath) {
+      if (trimmed === "$$") {
+        blocks.push(renderDisplayMath(displayMath.join("\n")));
+        displayMath = null;
+      } else {
+        displayMath.push(line);
+      }
+      continue;
+    }
+
     if (!trimmed) {
       flushOpenBlocks();
+      continue;
+    }
+
+    const oneLineMath = trimmed.match(/^\$\$\s*([\s\S]+?)\s*\$\$$/);
+    if (oneLineMath) {
+      flushOpenBlocks();
+      blocks.push(renderDisplayMath(oneLineMath[1]));
+      continue;
+    }
+
+    if (trimmed === "$$") {
+      flushOpenBlocks();
+      displayMath = [];
       continue;
     }
 
@@ -132,6 +187,10 @@ function renderSimpleMarkdown(markdown: string, options: RenderOptions = {}) {
     flushList();
     flushQuote();
     paragraph.push(trimmed);
+  }
+
+  if (displayMath) {
+    blocks.push(renderDisplayMath(displayMath.join("\n")));
   }
 
   flushOpenBlocks();

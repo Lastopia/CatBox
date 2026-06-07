@@ -3,7 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { notebooks } from "../../data/notebooks";
 
 const base = import.meta.env.BASE_URL;
-const noteModules = import.meta.glob("../../content/notes/**/*.md", { eager: true });
+const noteModules = import.meta.glob(["../../content/notes/**/*.md", "!../../content/notes/**/_*.md"], { eager: true });
 const coverImages = import.meta.glob("../../content/notes/*/background.{png,jpg,jpeg,webp,avif,gif}", {
   eager: true,
   import: "default",
