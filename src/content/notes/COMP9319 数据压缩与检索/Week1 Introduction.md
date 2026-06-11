@@ -1,7 +1,5 @@
----
-title: Week1 Introduction
+﻿---
 date: 2026-06-04
-notebook: 数据压缩与检索
 description: COMP9319 简介
 coreIdeas:
 ---

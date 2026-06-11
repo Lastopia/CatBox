@@ -9,7 +9,7 @@ const base = import.meta.env.BASE_URL;
   <section class="hero">
     <p class="eyebrow">Catbox Personal Site</p>
     <h1>猫箱</h1>
-    <p class="intro">一个装着个人简介、笔记本、作品和灵感的小型个人网站。</p>
+    <p class="intro hero-quote">Higher than the sky, deeper than the sea</p>
     <div class="actions">
       <a href={`${base}notebooks/`}>进入笔记本</a>
       <a href={`${base}about/`}>关于我</a>
@@ -20,6 +20,83 @@ const base = import.meta.env.BASE_URL;
     <div class="notice-pin"></div>
     <p class="eyebrow">{notice.eyebrow}</p>
     <h2>{notice.title}</h2>
-    <NoticeContent />
+    <div class="notice-content" data-notice-content>
+      <NoticeContent />
+    </div>
   </section>
+  <script is:inline>
+    const noticeContent = document.querySelector("[data-notice-content]");
+
+    if (noticeContent) {
+      const children = Array.from(noticeContent.children);
+      const sections = [];
+      let activeSection = null;
+
+      children.forEach((child) => {
+        if (child.tagName === "H1") {
+          activeSection = {
+            title: child.textContent?.trim() || "未命名",
+            nodes: [],
+          };
+          sections.push(activeSection);
+          return;
+        }
+
+        if (activeSection) {
+          activeSection.nodes.push(child);
+        }
+      });
+
+      if (sections.length > 1) {
+        const tabs = document.createElement("div");
+        const panels = document.createElement("div");
+        tabs.className = "notice-tabs";
+        tabs.setAttribute("role", "tablist");
+        tabs.setAttribute("aria-label", "公告栏分类");
+        panels.className = "notice-panels";
+
+        sections.forEach((section, index) => {
+          const tabId = `notice-tab-${index}`;
+          const panelId = `notice-panel-${index}`;
+          const button = document.createElement("button");
+          const panel = document.createElement("div");
+
+          button.type = "button";
+          button.id = tabId;
+          button.className = "notice-tab";
+          button.textContent = section.title;
+          button.setAttribute("role", "tab");
+          button.setAttribute("aria-controls", panelId);
+          button.setAttribute("aria-selected", String(index === 0));
+
+          panel.id = panelId;
+          panel.className = "notice-panel";
+          panel.setAttribute("role", "tabpanel");
+          panel.setAttribute("aria-labelledby", tabId);
+          panel.hidden = index !== 0;
+          panel.append(...section.nodes);
+
+          button.addEventListener("click", () => {
+            tabs.querySelectorAll(".notice-tab").forEach((tab) => {
+              tab.classList.toggle("is-active", tab === button);
+              tab.setAttribute("aria-selected", String(tab === button));
+            });
+
+            panels.querySelectorAll(".notice-panel").forEach((item) => {
+              item.hidden = item !== panel;
+            });
+          });
+
+          if (index === 0) {
+            button.classList.add("is-active");
+          }
+
+          tabs.append(button);
+          panels.append(panel);
+        });
+
+        noticeContent.replaceChildren(tabs, panels);
+      }
+    }
+  </script>
 </BaseLayout>

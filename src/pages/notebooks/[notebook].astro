@@ -4,8 +4,7 @@ import { getNotebook, notebooks } from "../../data/notebooks";
 
 type NoteModule = {
   frontmatter: {
-    title: string;
-    date: string;
+    date?: string;
     description?: string;
   };
 };
@@ -27,14 +26,19 @@ const notes = Object.entries(noteModules)
   .filter(([path]) => !path.split("/").at(-1)?.startsWith("_"))
   .map(([path, note]) => {
     const slug = path.replace("../../content/notes/", "").replace(/\.md$/, "");
+    const fileTitle = decodeURIComponent(slug.split("/").at(-1) ?? "未命名笔记");
+    const noteDate = note.frontmatter.date ? new Date(note.frontmatter.date) : null;
+    const displayDate = noteDate && !Number.isNaN(noteDate.getTime()) ? noteDate.toISOString().slice(0, 10) : "";
 
     return {
       ...note.frontmatter,
-      displayDate: new Date(note.frontmatter.date).toISOString().slice(0, 10),
+      title: fileTitle,
+      dateValue: noteDate && !Number.isNaN(noteDate.getTime()) ? noteDate.getTime() : 0,
+      displayDate,
       href: `${base}notebooks/${slug}/`,
     };
   })
-  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  .sort((a, b) => b.dateValue - a.dateValue);
 ---
 
 <BaseLayout title={`${notebook?.name ?? "笔记本"} | 猫箱`}>
@@ -55,7 +59,7 @@ const notes = Object.entries(noteModules)
           <div>
             <div class="note-row-header">
               <h2><a href={note.href}>{note.title}</a></h2>
-              <time datetime={note.displayDate}>{note.displayDate}</time>
+              {note.displayDate && <time datetime={note.displayDate}>{note.displayDate}</time>}
             </div>
             {note.description && <p>{note.description}</p>}
           </div>

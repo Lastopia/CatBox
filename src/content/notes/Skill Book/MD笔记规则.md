@@ -1,7 +1,5 @@
----
-title: MD笔记规则
+﻿---
 date: 2026-05-30
-notebook: 个人skill
 description: 用于统一MarkDown笔记风格
 coreIdeas:
   - 统一Markdown笔记风格

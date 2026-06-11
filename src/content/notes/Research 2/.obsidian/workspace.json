@@ -28,16 +28,17 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "世界模型总览.md",
+                "file": "Research Proposal.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "世界模型总览"
+              "title": "Research Proposal"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -202,10 +203,10 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "04973cc9eb41377e",
+  "active": "23bed5d9b743befa",
   "lastOpenFiles": [
-    "世界模型总览.md",
     "_链接卡片.md",
+    "Research Proposal.md",
     "研究计划总览.md",
     "附件/Pasted image 20260603120318.png",
     "background.png",

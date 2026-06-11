@@ -1,115 +1,141 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import aboutRaw from "../content/about.md?raw";
+import { frontmatter as about } from "../content/about.md";
 
 const base = import.meta.env.BASE_URL;
 
-const skills = [
-  {
-    title: "编程语言",
-    items: ["Python", "Java", "C/C++", "Rust", "JavaScript", "PHP", "SQL"],
-  },
-  {
-    title: "机器学习 / 深度学习",
-    items: ["PyTorch", "Hugging Face Transformers", "NumPy", "pandas", "scikit-learn", "OpenCV"],
-  },
-  {
-    title: "NLP / LLM",
-    items: ["Transformer", "DeBERTa", "LoRA", "decoder fine-tuning", "stance detection", "text classification"],
-  },
-  {
-    title: "计算机视觉",
-    items: ["CNN", "Faster R-CNN", "YOLO", "RT-DETR", "SIFT / LBP", "CAM-based XAI"],
-  },
-  {
-    title: "工程与部署",
-    items: ["Flask", "Gradio", "Docker", "ZooKeeper", "Vue", "React", "MySQL"],
-  },
-];
+type AboutLink = {
+  label: string;
+  href?: string;
+};
 
-const education = [
-  {
-    school: "新南威尔士大学（UNSW）",
-    time: "2024.09 - 2026.09 预计毕业",
-    detail: "信息技术硕士，人工智能方向；WAM 85.75",
-  },
-  {
-    school: "杜伦大学（Durham University）",
-    time: "2022.10 - 2023.10",
-    detail: "会计硕士；Merit",
-  },
-  {
-    school: "澳门大学（University of Macau）",
-    time: "2018.09 - 2022.07",
-    detail: "会计与信息系统本科；GPA 3.41/4.00",
-  },
-];
+type AboutFrontmatter = {
+  title: string;
+  eyebrow?: string;
+  description?: string;
+  links?: AboutLink[];
+};
 
-const experiences = [
-  {
-    title: "LLM 位置编码、What-Where 表征解耦与 SAE 可解释性研究",
-    meta: "UNSW 研究项目 / 拟硕士论文 | 2026.02 - 2026.05",
-    points: [
-      "围绕位置编码、内容-位置解耦与 Sparse Autoencoder 可解释性开展文献调研、问题定义和实验设计。",
-      "设计 RoPE 与 PoPE 的系统性对比实验，用于分析位置编码对语言模型训练、attention logit 频谱结构与 SAE 特征学习的影响。",
-      "搭建端到端实验 pipeline，支持位置编码模块切换、模型配置、数据集准备、checkpoint 选择、attention 分析、SAE 训练与指标评估。",
-    ],
-  },
-  {
-    title: "立场检测系统：Baseline、Encoder、Decoder-LoRA、CLI 与 Gradio Demo",
-    meta: "NLP / LLM 项目 | 2026.02 - 2026.05",
-    points: [
-      "构建立场检测 pipeline，将输入分类为 Against、None、Favor，并支持预处理、训练、评估、模型保存与推理输出。",
-      "实现 TF-IDF + NRC + LinearSVC baseline、DeBERTa encoder frozen / unfrozen 设置，以及 decoder-based LoRA 微调方案。",
-      "开发 CLI 与 Gradio 推理界面，支持 preflight checks、模型加载、CSV 批量预测、指标汇报、混淆矩阵生成与 demo 展示。",
-    ],
-  },
-  {
-    title: "AgroPest-12 农业害虫检测与分类项目",
-    meta: "COMP9517 Computer Vision 课程项目 | 2025.10 - 2025.11",
-    points: [
-      "基于 AgroPest-12 数据集开展害虫检测与分类实验，数据集包含 12 类害虫及 bounding box 标注。",
-      "实现传统机器学习方案，包括 SIFT / LBP 特征提取与 SVM / KNN 分类模型。",
-      "参与 benchmark 分析，涵盖 YOLOv8 / YOLOv11、RT-DETR、InceptionV3、EfficientNetB0 与 CAM-based XAI。",
-    ],
-  },
-  {
-    title: "北京大唐高鸿数据网络技术有限公司",
-    meta: "算法工程师实习生 | 2023.12 - 2024.03",
-    points: [
-      "参与火电厂 AI 智慧预警系统与 AIGO 算法平台开发，面向设备测点数据清洗、故障预警与模型封装。",
-      "使用 Python 与 pandas 对设备测点数据进行业务清洗与预处理，为后续模型训练和实时分析提供结构化输入。",
-      "将 MSET 预警算法封装为 Python 接口，通过 Flask 构建服务路由，并配合 ZooKeeper、Docker 与 Java 后端完成数据联调。",
-    ],
-  },
-];
+type Card = {
+  title: string;
+  text: string;
+};
+
+type SkillGroup = {
+  title: string;
+  items: string[];
+};
+
+type TimelineItem = {
+  title: string;
+  time: string;
+  detail: string;
+};
+
+type ExperienceItem = {
+  title: string;
+  meta: string;
+  points: string[];
+};
+
+function stripFrontmatter(markdown: string) {
+  return markdown.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+}
+
+function getSection(markdown: string, title: string) {
+  const pattern = new RegExp(`^##\\s+${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "m");
+  const match = markdown.match(pattern);
+  if (!match || match.index === undefined) return "";
+
+  const start = match.index + match[0].length;
+  const rest = markdown.slice(start);
+  const next = rest.search(/^##\s+/m);
+  return (next === -1 ? rest : rest.slice(0, next)).trim();
+}
+
+function splitCards(section: string) {
+  const matches = [...section.matchAll(/^###\s+(.+)$/gm)];
+  return matches.map((match, index) => {
+    const next = matches[index + 1];
+    const start = (match.index ?? 0) + match[0].length;
+    const end = next?.index ?? section.length;
+    return {
+      title: match[1].trim(),
+      body: section.slice(start, end).trim(),
+    };
+  });
+}
+
+function parseList(body: string) {
+  return body
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/^[-*]\s+/, ""))
+    .filter(Boolean);
+}
+
+function parseFieldBody(body: string, fieldName = "时间") {
+  const lines = body.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const fieldPrefix = `${fieldName}:`;
+  const fieldIndex = lines.findIndex((line) => line.startsWith(fieldPrefix));
+  const field = fieldIndex === -1 ? "" : lines[fieldIndex].slice(fieldPrefix.length).trim();
+  const contentLines = lines.filter((_, index) => index !== fieldIndex);
+  return { field, contentLines };
+}
+
+const aboutData = about as AboutFrontmatter;
+const aboutContent = stripFrontmatter(aboutRaw);
+
+const overview: Card[] = splitCards(getSection(aboutContent, "个人概况")).map((card) => ({
+  title: card.title,
+  text: card.body.replace(/\r?\n+/g, " "),
+}));
+
+const skills: SkillGroup[] = splitCards(getSection(aboutContent, "技术栈")).map((card) => ({
+  title: card.title,
+  items: parseList(card.body),
+}));
+
+const education: TimelineItem[] = splitCards(getSection(aboutContent, "教育背景")).map((card) => {
+  const { field, contentLines } = parseFieldBody(card.body);
+  return {
+    title: card.title,
+    time: field,
+    detail: contentLines.join(" "),
+  };
+});
+
+const experiences: ExperienceItem[] = splitCards(getSection(aboutContent, "研究、项目与实习")).map((card) => {
+  const { field, contentLines } = parseFieldBody(card.body);
+  return {
+    title: card.title,
+    meta: field,
+    points: parseList(contentLines.join("\n")),
+  };
+});
 ---
 
-<BaseLayout title="关于我 | 猫箱">
+<BaseLayout title={`${aboutData.title} | 猫箱`}>
   <a class="back-link page-back" href={base}>返回首页</a>
 
   <section class="about-hero">
-    <p class="eyebrow">About</p>
-    <h1>张雨童</h1>
-    <p>
-      新南威尔士大学人工智能方向硕士在读，关注大模型、NLP、多模态、计算机视觉与 AI 算法工程。喜欢把研究问题拆成可以运行、可以复现、可以解释的实验系统。
-    </p>
+    <p class="eyebrow">{aboutData.eyebrow ?? "About"}</p>
+    <h1>{aboutData.title}</h1>
+    {aboutData.description && <p>{aboutData.description}</p>}
     <div class="about-links">
-      <a href="mailto:z5526932@ad.unsw.edu.au">z5526932@ad.unsw.edu.au</a>
-      <a href="https://github.com/Lastopia/">GitHub / Lastopia</a>
-      <span>现居悉尼</span>
-      <span>预计毕业：2026.09</span>
+      {(aboutData.links ?? []).map((link) =>
+        link.href ? <a href={link.href}>{link.label}</a> : <span>{link.label}</span>
+      )}
     </div>
   </section>
 
   <section class="about-grid" aria-label="个人概况">
-    <article class="about-card">
-      <h2>研究与求职方向</h2>
-      <p>大模型 / NLP / 多模态 / 计算机视觉 / AI 算法工程师</p>
-    </article>
-    <article class="about-card">
-      <h2>当前关注</h2>
-      <p>LLM 位置编码、表征解耦、Sparse Autoencoder 可解释性、可信 LLM、幻觉诊断与空间推理。</p>
-    </article>
+    {overview.map((item) => (
+      <article class="about-card">
+        <h2>{item.title}</h2>
+        <p>{item.text}</p>
+      </article>
+    ))}
   </section>
 
   <section class="about-section">
@@ -132,7 +158,7 @@ const experiences = [
       {education.map((item) => (
         <article class="timeline-item">
           <div>
-            <h3>{item.school}</h3>
+            <h3>{item.title}</h3>
             <p>{item.detail}</p>
           </div>
           <time>{item.time}</time>

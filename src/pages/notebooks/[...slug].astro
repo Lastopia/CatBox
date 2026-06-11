@@ -6,9 +6,7 @@ import { parseConceptCards, parseLinkCards } from "../../utils/conceptCards";
 type NoteModule = {
   Content: unknown;
   frontmatter: {
-    title: string;
-    date: string;
-    notebook: string;
+    date?: string;
     description?: string;
     coreIdeas?: string[];
   };
@@ -63,8 +61,11 @@ const { note, rawContent, rawLinkCards, imageUrls } = Astro.props;
 const { Content } = note;
 const notebookSlug = Astro.params.slug?.split("/")[0] ?? "";
 const notebook = getNotebook(notebookSlug);
+const notebookName = notebook?.name ?? decodeURIComponent(notebookSlug);
 const base = import.meta.env.BASE_URL;
-const displayDate = new Date(note.frontmatter.date).toISOString().slice(0, 10);
+const noteTitle = decodeURIComponent(Astro.params.slug?.split("/").at(-1) ?? "未命名笔记");
+const noteDate = note.frontmatter.date ? new Date(note.frontmatter.date) : null;
+const displayDate = noteDate && !Number.isNaN(noteDate.getTime()) ? noteDate.toISOString().slice(0, 10) : "";
 const coreIdeas = note.frontmatter.coreIdeas ?? [];
 const conceptCards = parseConceptCards(rawContent);
 const resolveCardImage = (src: string) => {
@@ -80,13 +81,13 @@ const linkCards = parseLinkCards(rawLinkCards, { resolveImage: resolveCardImage 
 const hasPaperCards = linkCards.some((card) => isPaperCard(card.type));
 ---
 
-<BaseLayout title={`${note.frontmatter.title} | 猫箱`}>
+<BaseLayout title={`${noteTitle} | 猫箱`}>
   <article class:list={["note-article", hasPaperCards && "has-link-cards"]}>
-    <a class="back-link" href={`${base}notebooks/${notebookSlug}/`}>返回{notebook?.name ?? "笔记本"}</a>
+    <a class="back-link" href={`${base}notebooks/${notebookSlug}/`}>返回{notebookName}</a>
     <header>
-      <p class="eyebrow">{note.frontmatter.notebook}</p>
-      <time datetime={displayDate}>{displayDate}</time>
-      <h1>{note.frontmatter.title}</h1>
+      <p class="eyebrow">{notebookName}</p>
+      {displayDate && <time datetime={displayDate}>{displayDate}</time>}
+      <h1>{noteTitle}</h1>
       {note.frontmatter.description && <p>{note.frontmatter.description}</p>}
     </header>
     {coreIdeas.length > 0 && (
