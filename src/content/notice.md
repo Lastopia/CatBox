@@ -20,11 +20,11 @@ eyebrow: Notice Board
 
 ## Week2
 ### 课业
-- [ ] COMP9319 lec1
+- [x] COMP9319 lec1 ✅ 2026-06-11
 - [ ] COMP9319 lec2
-- [ ] COMP9418 lec1
+- [x] COMP9418 lec1 ✅ 2026-06-11
 - [ ] COMP9418 lec2
-- [ ] COMP9418 quiz1
+- [x] COMP9418 quiz1 ✅ 2026-06-11
 
 ### 研究
 - [ ] 阅读世界模型论文 (2/5)

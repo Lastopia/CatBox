@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Week1 Introduction.md",
+                "file": "Week2 LZW Adaptive Huffman and BWT.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Week1 Introduction"
+              "title": "Week2 LZW Adaptive Huffman and BWT"
             }
           }
         ]
@@ -189,6 +189,9 @@
   },
   "active": "e039a06cb6b575b3",
   "lastOpenFiles": [
+    "Week1 Introduction.md",
+    "Week2 LZW Adaptive Huffman and BWT.md",
+    "Note Skill.md",
     "附件/Pasted image 20260604214611.png",
     "附件/Pasted image 20260604213505.png",
     "附件/Pasted image 20260603120318.png",

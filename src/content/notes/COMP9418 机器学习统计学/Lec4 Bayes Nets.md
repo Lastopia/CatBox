@@ -215,22 +215,17 @@ coreIdeas:
 
 # D-Separation
 
-## 为什么需要 d-separation
-
-- 仅靠 graphoid axioms 手推 independence 很麻烦。
-- d-separation 是一个图形化测试，用来直接从 DAG 中读出 conditional independence。
-- 给定三组互不相交的变量 $\mathbf{X},\mathbf{Y},\mathbf{Z}$。
-- 如果 $\mathbf{Z}$ blocked every path between $\mathbf{X}$ and $\mathbf{Y}$，就说 $\mathbf{X}$ 和 $\mathbf{Y}$ 被 $\mathbf{Z}$ d-separated。
-- 记作 $dsep_G(\mathbf{X},\mathbf{Z},\mathbf{Y})$。
-- 如果 $dsep_G(\mathbf{X},\mathbf{Z},\mathbf{Y})$ 成立，那么所有由 $G$ 诱导的分布都满足 $\mathbf{X}\perp\mathbf{Y}\mid\mathbf{Z}$。
+> 所谓的D-sparation就是之前我跟你讲的顺着图看看有没有哪个点阻断，来判断两个变量之间的独立性关系，如果 $dsep_G(\mathbf{X},\mathbf{Z},\mathbf{Y})$ 成立，那么所有由 $G$ 诱导的分布都满足 $\mathbf{X}\perp\mathbf{Y}\mid\mathbf{Z}$。
 
 ## path 和 valve
 
 - d-separation 判断 path 时忽略边的方向，只看两个节点之间是否存在连接路径。
-- 可以把一条 path 想成管道，把 path 上的中间节点 $W$ 想成 valve。
+- 可以把一条 path 想成管道，把 path 上的中间节点 $W$ 想成 valve（阀门）。
 - 如果 path 上至少有一个 valve closed，那么这条 path 就 blocked。
 - 如果 path 上没有 closed valve，那么这条 path 是 active。
-- 若 $\mathbf{X}$ 和 $\mathbf{Y}$ 之间所有 paths 都 blocked，才算 d-separated。
+
+>若 $\mathbf{X}$ 和 $\mathbf{Y}$ 之间所有 paths 都 blocked，才算 d-separated。
+>
 - 注意：没有中间 valve 的 path，例如 $X\to Y$，不会被这个规则 blocked。
 
 ## 三种 valve
@@ -269,6 +264,8 @@ coreIdeas:
 
 ## 不完全性
 
+> d-separation 的一定符合独立，但是不d-separation的，也有可能互相独立，因为可能会藏在CPT里面
+
 - d-separation 对某个具体参数化 $\Theta$ 不一定 complete。
 - 原因是：某些 independence 可能藏在参数里，而 d-separation 只看图，不看 CPT 数值。
 - 因此：
@@ -279,19 +276,17 @@ coreIdeas:
 
 # Independence Maps
 
-## I-MAP
-
-- Independence map (I-MAP) 描述 DAG 中的 independence 和分布 $P$ 中的 independence 的关系。
-- $G$ 是 $P$ 的 I-MAP，当且仅当图中 d-separation 声明的每个 independence 都真的在 $P$ 中成立。
+G代表DAG中的independence，P代表联合概率分布：
+ $\mathbf{X}\perp\mathbf{Y}\mid\mathbf{Z}$ 和 $P(\mathbf{X},\mathbf{Y}|\mathbf{Z})=P(\mathbf{X}|\mathbf{Z})P(\mathbf{Y}|\mathbf{Z})$ 是对应的。
+## I-MAP (独立图)
+- $G$ 是 $P$ 的 I-MAP，要求图G可以少说，不能瞎说
 - 公式方向是：$dsep_G(\mathbf{X},\mathbf{Z},\mathbf{Y})$ 推出 $\mathbf{X}\perp\mathbf{Y}\mid\mathbf{Z}$。
 - 如果 $P$ 是由 BN $(G,\Theta)$ 诱导的，那么 $G$ 一定是 $P$ 的 I-MAP。
 - Minimal I-MAP 指的是：如果从 $G$ 删除任意一条边，它就不再是 I-MAP。
-- Minimal I-MAP 往往表达更多 independences，因此需要更少参数。
-
+- Minimal I-MAP ，边越少，能表达的independence 越多，而边越少，产生的条件概率参数也就越少
+> 非最小的I-MAP多出来的东西是边，边越多，d-separation就越难发生，图能表达的独立关系就越少。
 ## D-MAP
-
-- Dependency map (D-MAP) 是另一个方向。
-- $G$ 是 $P$ 的 D-MAP，当且仅当 $P$ 中的每个 independence 都能被图中的 d-separation 捕捉到。
+- $G$ 是 $P$ 的 D-MAP，要求图G不能少说，但可能会多说
 - 公式方向是：$\mathbf{X}\perp\mathbf{Y}\mid\mathbf{Z}$ 推出 $dsep_G(\mathbf{X},\mathbf{Z},\mathbf{Y})$。
 - 如果 $P$ 是由 BN $(G,\Theta)$ 诱导的，$G$ 不一定是 D-MAP。
 - 因为参数可能产生额外 independence，但图结构看不出来。

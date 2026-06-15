@@ -1,4 +1,4 @@
-﻿---
+---
 date: 2026-06-04
 description: COMP9319 简介
 coreIdeas:
@@ -11,6 +11,7 @@ coreIdeas:
 
 - BWT (Burrows-Wheeler Transform):  所有“循环移位”进行排序，取字典排序后的所有末位排列。
 	不直接压缩，排序后更加容易被RLE压缩，原理是相似的上下文前面经常出现相似甚至相同的字符
+> 解压缩的方式就是将压缩后的文字排序然后再加上压缩的文字。得到的字符串再加上之前压缩的那个文字的。再排序。一直重复，重复到第一行出现为止。
 
 - 压缩的好处：
 	1. 节省网络带宽
@@ -109,3 +110,11 @@ coreIdeas:
 
 - 虽然算术编码比霍夫曼编码的压缩率更高，但实际上通常用的更多的是霍夫曼编码。因为霍夫曼编码它更简单，实现更快，更加成熟，并且不用担心专利问题。
 
+	You can use bits to represent a binary fraction. For example:
+	
+	$01=0*\frac{1}{2}+1*\frac{1}{2^2}=0.25$
+	$101=1*\frac{1}{2}+0*1*\frac{1}{2^2}+1*\frac{1}{2^3}=0.625$
+	
+	In arithmetic coding, the whole message is mapped to an interval. For example, if the string “comp9319” is mapped to the interval [0.623, 0.7), then 0.101₂ = 0.625 lies inside this interval, so the bit sequence 101 can represent the whole string.
+	
+	The output still uses an integer number of bits. But when we divide the total number of bits by the number of symbols, the average can be fractional. For example, if a 30-character message is encoded using 100 bits, then the average cost is 100 / 30 = 3.33 bits per character.
