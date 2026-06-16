@@ -144,6 +144,7 @@ coreIdeas:
 ## network instantiation 和 compatible parameter
 
 - 网络实例化(network instantiation)是给所有 network variables 都赋值。
+- 一个实例化就是一个world，意思是这个parameter 是符合现实逻辑的
 - 一个参数 $\theta_{x \mid \mathbf{u}}$ 和一个完整实例化 $\mathbf{z}$ compatible，当且仅当 $x,\mathbf{u}$ 和 $\mathbf{z}$ 在共同变量上赋值一致。
 - 记作：$\theta_{x \mid \mathbf{u}} \sim \mathbf{z}$。
 - 对一个完整 world，只会从每个变量的 CPT 里选出一个 compatible parameter。
@@ -161,7 +162,7 @@ coreIdeas:
 # Complexity
 
 - 一个变量的 CPT 大小随 parents 数量指数增长。
-- 如果每个变量最多有 $k$ 个 parents，每个变量最多有 $d$ 个取值，一个 CPT 的规模约为 $O(d^{k+1})$。
+- 如果每个变量最多有 $k$ 个 parents，每个变量最多有 $d$ 个取值，一个 CPT 的规模约为 $O(d^{k+1})$。1是指的他自己本身也是一个变量
 - 有 $n$ 个变量时，总参数表规模约为 $O(nd^{k+1})$。
 - 只要每个变量的 parents 很少，这个规模就比完整 joint distribution 小得多。
 - 如果某些变量有很多 parents，CPT 仍然会变大，后续需要更紧凑的 CPT 表示方法。
@@ -170,7 +171,7 @@ coreIdeas:
 
 # Independence Properties
 
-## 为什么需要 graphoid axioms (石墨烯公理)
+## 为什么需要 graphoid axioms (图论公理)
 
 - BN 诱导出的分布一定满足 $Markov(G)$ 中的 independence。
 - 但这些不是它满足的全部 independences。
@@ -180,13 +181,12 @@ coreIdeas:
 ## Symmetry
 
 - 对称性(symmetry)：如果知道 $\mathbf{Y}$ 不影响对 $\mathbf{X}$ 的 belief，那么知道 $\mathbf{X}$ 也不影响对 $\mathbf{Y}$ 的 belief。
-- 公式：$\mathbf{X}\perp\mathbf{Y}\mid\mathbf{Z}$ 当且仅当 $\mathbf{Y}\perp\mathbf{X}\mid\mathbf{Z}$。
-- 例子：从 $A\perp R\mid B,E$ 可以得到 $R\perp A\mid B,E$。
+- 例子：从 $A\perp R\mid B,E$ 可以推出：
+	- $R\perp A\mid B,E$。
 
 ## Decomposition
 
-- 分解性(decomposition)：如果一整组信息 $\mathbf{Y}\cup\mathbf{W}$ 都无关，那么其中任意一部分也无关。
-- 公式：$\mathbf{X}\perp\mathbf{Y}\cup\mathbf{W}\mid\mathbf{Z}$ 推出 $\mathbf{X}\perp\mathbf{Y}\mid\mathbf{Z}$ 和 $\mathbf{X}\perp\mathbf{W}\mid\mathbf{Z}$。
+- 分解性(decomposition)：如果一整组信息 $\mathbf{Y}\cup\mathbf{W}$ (Y,W)都无关，那么其中任意一部分也无关。
 - 例子：从 $R\perp A,C,B\mid E$ 可以推出：
 	- $R\perp A\mid E$。
 	- $R\perp C\mid E$。
@@ -198,7 +198,8 @@ coreIdeas:
 - 弱并(weak union)：如果 $\mathbf{Y}$ 和 $\mathbf{W}$ 合起来都无关，那么在已知 $\mathbf{Y}$ 后，$\mathbf{W}$ 仍然无关。
 - 公式：$\mathbf{X}\perp\mathbf{Y}\cup\mathbf{W}\mid\mathbf{Z}$ 推出 $\mathbf{X}\perp\mathbf{W}\mid\mathbf{Z}\cup\mathbf{Y}$。
 - 可以理解成：无关信息的一部分被加入条件里，不会让剩下的无关信息突然变得相关。
-- 例子：从 $C\perp B,E,R\mid A$ 可以推出 $C\perp R\mid A,B,E$。
+- 例子：从 $C\perp B,E,R\mid A$ 可以推出：
+	- $C\perp R\mid A,B,E$。
 
 ## Contraction
 
@@ -331,6 +332,7 @@ G代表DAG中的independence，P代表联合概率分布：
 	- children of $X$。
 	- spouses of $X$。
 - spouse 指的是和 $X$ 有共同 child 的变量。
+- 有时候boundary 不一定是parents + children + spouses，因为有时候CPT藏着额外的independecies，这个时候就不需要全部了
 - 为什么需要 spouses：因为 child 是 collider，观察 child 会让共同 parents 之间产生依赖。
 - 所以要屏蔽所有其他变量，不能只看 parents 和 children，还要包括共同 child 的其他 parents。
 
